@@ -3,7 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include "lex.yy.c"
-
+#include <stdbool.h>
+#define MAX_FUNCS 100
+#define MAX_Var 100
 typedef struct node
 {
 	char *token;
@@ -25,7 +27,10 @@ void printNewline();
 int streq(char* s1, char* s2);
 int isType(char* t);
 int isOperator(char* t);
-
+void register_func(char* name);
+bool func_exists(char* name);
+void register_var(char* name);
+bool var_exists(char* name);
 int openParenthesis = 0;
 int pauselevel = 0;
 int main_defined = 0;
@@ -33,6 +38,13 @@ int hadOperator = 0;
 int currentTab = 0;
 int yylex();
 int yyerror(char *e);
+
+
+char* defined_funcs[MAX_FUNCS];
+int func_count = 0;
+
+int var_count = 0;
+char* defined_vars[MAX_Var];
 
 %}
 
@@ -85,10 +97,22 @@ procedures: procedures proc {$$=mknode("",$1,$2);}
 
 proc:		DEF ID LPAREN params RPAREN COLON RETURNS functype BEG body_ret  END
 			{
+
+			if (func_exists($2)) {
+				yyerror("Error: Function name already defined.");
+				YYABORT;
+			}
+			register_func($2);
+
 				$$=mknode("(FUNC\n\t ", mknode($2,mknode("\n",mknode("\t\t(PARS\n ",$4,NULL),mknode("\n\t\t(RET ",$8,NULL)),NULL),$10);
 			}
 			| DEF ID LPAREN params RPAREN COLON BEG body END
 			{
+				if (func_exists($2)) {
+				yyerror("Error: Function name already defined.");
+				YYABORT;
+			}
+			register_func($2);
 				$$=mknode("(FUNC\n\t ", mknode($2,mknode("\n",mknode("\n\t\t(PARS\n\t ",$4,NULL),mknode("\n\t\t(RET ",NULL,NULL)),NULL),mknode(")\n",$8,NULL));
 			}
 			| DEF MAIN LPAREN params RPAREN COLON RETURNS functype BEG body_ret END
@@ -145,7 +169,7 @@ ret: 		RETURN expr SEMICOLON {$$=mknode("return",$2,NULL);};
 
 
 
-varblock: VAR typedecls { $$ = mknode("DECLARE_BLOCK\n\t\t\t", $2, NULL); }
+varblock: VAR BEG typedecls END { $$ = mknode("DECLARE_BLOCK\n\t\t\t", $3, NULL); }
 
 typedecls:
     typedecls typedecl          { $$ = mknode("TYPELIST\n\t\t\t", $1, $2); }
@@ -162,7 +186,15 @@ vardecls:
     ;
 
 vardecl:
-    ID COLON value              { $$ = mknode("VAR_DEF", mknode($1, $3, NULL), NULL); }
+    ID COLON value              { 
+		if (var_exists($1)){
+			yyerror("two variables have the same name in the scope! $17\n");
+			YYABORT;
+		}		
+		register_var($1);
+		$$ = mknode("VAR_DEF", mknode($1, $3, NULL), NULL); 
+		}
+		
     ;
 
 
@@ -349,7 +381,12 @@ expr_list:	expr COMMA expr_list {$$=mknode("",$1,mknode("",$3,NULL));}
 paren_expr:	LPAREN expr_list RPAREN {$$=$2;};
 
 //call func rule
-call_func: ID paren_expr {$$=mknode("Call func",mknode($1,NULL,NULL),mknode("args ",$2,NULL));} ;
+call_func: ID paren_expr {
+	if (!func_exists($1)){
+		yyerror("function is not defined!");
+		YYABORT;
+	}
+	$$=mknode("Call func",mknode($1,NULL,NULL),mknode("args ",$2,NULL));} ;
 
 %%
 
@@ -449,6 +486,33 @@ void printTree(node* tree) {
 	printtree(tree, 0, 0);
 }
 
+
+
+bool func_exists(char* name) {
+	for (int i = 0; i < func_count; ++i) {
+		if (strcmp(defined_funcs[i], name) == 0) return true;
+	}
+	return false;
+}
+
+void register_func(char* name) {
+	if (func_count < MAX_FUNCS) {
+		defined_funcs[func_count++] = strdup(name);
+	}
+}
+
+void register_var(char* name) {
+	if(var_count<MAX_Var){
+		defined_vars[var_count++] = strdup(name);
+	}
+}
+
+bool var_exists(char* name){
+	for(int i =0; i< var_count ; i++){
+		if (strcmp(defined_vars[i],name)==0) return true;
+	}
+	return false;
+}
 void printtree(node* tree, int level, int linebreak) {
 	char* t = tree->token;
 	struct node* left = tree->left;
