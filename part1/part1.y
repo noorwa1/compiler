@@ -65,7 +65,7 @@ int yyerror(char *e);
 %nonassoc ELSE
 %type <node> varblock typedecls typedecl vardecls vardecl
 %type <node> project program ret ref expr lhs derefrence_expr expr_list call_func paren_expr
-%type <node> params parameters par value var_asis str_dec declars declartions statements statement
+%type <node> params parameters par value var_asis str_dec  declartions statements statement
 %type <node> stmnt_block if if_block if_else while do for for_declars 
 %type <node> proc procedures functype  body body_ret assignment block 
 
@@ -98,7 +98,7 @@ proc:		DEF ID LPAREN params RPAREN COLON RETURNS functype BEG body_ret  END
 					yyerror($2);
 					YYABORT;
 				}
-				if ($4!=NULL) {
+				if (main_defined && $4!=NULL) {
 					yyerror("Main function does not except parameters!\n");
 					YYABORT;
 				}
@@ -145,10 +145,10 @@ ret: 		RETURN expr SEMICOLON {$$=mknode("return",$2,NULL);};
 
 
 
-varblock: VAR typedecls { $$ = mknode("DECLARE_BLOCK", $2, NULL); }
+varblock: VAR typedecls { $$ = mknode("DECLARE_BLOCK\n\t\t\t", $2, NULL); }
 
 typedecls:
-    typedecls typedecl          { $$ = mknode("TYPELIST", $1, $2); }
+    typedecls typedecl          { $$ = mknode("TYPELIST\n\t\t\t", $1, $2); }
   | typedecl                    { $$ = $1; }
     ;
 
@@ -171,12 +171,7 @@ vardecl:
 
 
 declartions: varblock declartions {$$=mknode("",$1,$2);}
-            | VAR declars declartions {$$=mknode("",$2,$3);}
             | {$$=NULL;}
-
-
-declars:	TYPE functype COLON ID COLON value SEMICOLON {$$=mknode($4,NULL,NULL);}
-			| TYPE STRING COLON str_dec SEMICOLON {$$=mknode("string",$4,NULL);}
 
 
 for_declars: VAR functype var_asis {$$=mknode("var",$2,$3);}
