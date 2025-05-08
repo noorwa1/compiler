@@ -26,10 +26,10 @@ def {return DEF;}
 null {return NULLL;}
 begin {return BEG;}
 end {return END;}
-type { printf("TOKEN: TYPE\n"); return TYPE; }
+type {return TYPE; }
 return {return RETURN;}
 returns {return RETURNS;}
-";" {printf("TOKEN: SEMICOLON\n"); return SEMICOLON;}
+";" {return SEMICOLON;}
 
 "par"[0-9]+  {
     yylval.num = strdup(yytext);
@@ -79,12 +79,12 @@ FALSE                                   {return BFALSE;}
 0(x|X)[0-9A-F]+                         {yylval.string = strdup(yytext); return HEX_VAL;}
 [0-9]\.?[0-9]([eE][-+]?[0-9]+)?       {yylval.string = strdup(yytext); return REAL_VAL;}
 
-[\n]                                    {yylineno++;} //For each line (enter=\n), do yylineo+=1
+[\n]                                    {yylineno++;} 
 [ \t]+                                  ;
 .                                       return yytext[0];
 
 %%
-int yywrap(void)        /* called at end of input */
+int yywrap(void)        
 {
-    return 1;           /* terminate now */
+    return 1;           
 }
