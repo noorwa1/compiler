@@ -26,9 +26,10 @@ def {return DEF;}
 null {return NULLL;}
 begin {return BEG;}
 end {return END;}
-"type" { return TYPE;}
+type { printf("TOKEN: TYPE\n"); return TYPE; }
 return {return RETURN;}
 returns {return RETURNS;}
+";" {printf("TOKEN: SEMICOLON\n"); return SEMICOLON;}
 
 "par"[0-9]+  {
     yylval.num = strdup(yytext);
@@ -53,7 +54,6 @@ returns {return RETURNS;}
 
 "_main_" {yylval.string = strdup(yytext); return MAIN;}
 "|" {return LENGTH;}
-";" {return SEMICOLON;}
 "," {return COMMA;}
 "{" {return LBRACE;}
 "}" {return RBRACE;}
