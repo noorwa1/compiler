@@ -1,0 +1,22 @@
+def foo(par1 int:x; par2 int:y; par3 int:z; par4 real:f): 
+ begin
+	if notFALSE:
+	begin
+	 x = 3;
+	end
+	else: x = x-1;
+	while FALSE: x = x + 1;
+	for ( i=0; i<10 and a!=sum; i=i+2):
+	begin a = a + i; end
+
+end
+
+def goo(): returns char
+ begin
+	return 'a';
+end
+
+def _main_ (): returns int
+begin
+ return 0;
+end
