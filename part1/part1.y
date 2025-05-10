@@ -169,7 +169,7 @@ ret: 		RETURN expr SEMICOLON {$$=mknode("return",$2,NULL);};
 
 
 
-varblock: VAR BEG typedecls END { $$ = mknode("DECLARE_BLOCK\n\t\t\t", $3, NULL); }
+varblock: VAR typedecls BEG statements END{ $$ = mknode("DECLARE_BLOCK\n\t\t\t", $2, $4); }
 
 typedecls:
     typedecls typedecl          { $$ = mknode("TYPELIST\n\t\t\t", $1, $2); }
