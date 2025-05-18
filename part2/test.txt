@@ -1,0 +1,32 @@
+def foo(par1 int:x; par2 int:y; par3 int:z; par4 real:f): 
+var
+	type string: a[30], b[100] : "moshe", s[11];
+	type char: c:'d';
+	type int: i:1 , j;
+ begin
+	for (i=0; i<10 and a!=sum; i=i+2):
+	begin a = a + i; end
+	i[0]=1;
+	if notFALSE:
+	begin
+	 x = 3;
+	end
+	else: x = x-1;
+	while notFALSE: x = x + 1;
+	for ( i=0; i<10 and a!=sum; i=i+2):
+	begin a = a + i; end
+
+end
+
+def goo(): returns char
+var
+	type string: va[30], n[100] : "moshe", p[11];
+	type int: i:1;
+ begin
+	return 'a';
+end
+
+def _main_ (): returns int
+begin
+ return 0;
+end
