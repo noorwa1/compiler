@@ -39,13 +39,14 @@ int currentTab = 0;
 int yylex();
 int yyerror(char *e);
 
-
+int isBooleanExpression(char* token);
+void validate_array_index(char* val);
 char* defined_funcs[MAX_FUNCS];
 int func_count = 0;
-
+void clear_var_scope();
 int var_count = 0;
 char* defined_vars[MAX_Var];
-
+int parm_num=1;
 %}
 
 %union
@@ -75,7 +76,7 @@ char* defined_vars[MAX_Var];
 %nonassoc LPAREN
 %nonassoc IF
 %nonassoc ELSE
-%type <node> varblock typedecls typedecl vardecls vardecl
+%type <node> varblock typedecls typedecl vardecls vardecl str_item
 %type <node> project program ret ref expr lhs derefrence_expr expr_list call_func paren_expr
 %type <node> params parameters par value var_asis str_dec  declartions statements statement
 %type <node> stmnt_block if if_block if_else while do for for_declars 
@@ -95,41 +96,53 @@ procedures: procedures proc {$$=mknode("",$1,$2);}
 			;
 
 
-proc:		DEF ID LPAREN params RPAREN COLON RETURNS functype BEG body_ret  END
-			{
+proc:
+    DEF ID LPAREN params RPAREN COLON RETURNS functype declartions BEG body_ret END
+    {
 
-			if (func_exists($2)) {
-				yyerror("Error: Function name already defined.");
-				YYABORT;
-			}
-			register_func($2);
+        $$ = mknode("(FUNC\n\t ",
+                    mknode($2,
+                           mknode("\n",
+                                  mknode("\t\t(PARS\n ", $4, NULL),
+                                  mknode("\n\t\t(RET ", $8,
+                                         mknode("\n\t\t(DECLS\n", $9, NULL))
+                           ),
+                           NULL
+                    ),
+                    $11);
+    }
 
-				$$=mknode("(FUNC\n\t ", mknode($2,mknode("\n",mknode("\t\t(PARS\n ",$4,NULL),mknode("\n\t\t(RET ",$8,NULL)),NULL),$10);
-			}
-			| DEF ID LPAREN params RPAREN COLON BEG body END
-			{
-				if (func_exists($2)) {
-				yyerror("Error: Function name already defined.");
-				YYABORT;
-			}
-			register_func($2);
-				$$=mknode("(FUNC\n\t ", mknode($2,mknode("\n",mknode("\n\t\t(PARS\n\t ",$4,NULL),mknode("\n\t\t(RET ",NULL,NULL)),NULL),mknode(")\n",$8,NULL));
-			}
-			| DEF MAIN LPAREN params RPAREN COLON RETURNS functype BEG body_ret END
-			{
-				if (main_defined) {
-					yyerror("Error: Multiple 'main' functions are not allowed.");
-					yyerror($2);
-					YYABORT;
-				}
-				if (main_defined && $4!=NULL) {
-					yyerror("Main function does not except parameters!\n");
-					YYABORT;
-				}
-				main_defined = 1;
-				$$ = mknode("(FUNC\n\t ", mknode($2,mknode("\n",mknode("\n\t\t(None\n ", NULL, NULL),mknode("\n\t\t(RET ", $8, NULL)), NULL),mknode(")\n", $10, NULL));
-			}
-			;
+  | DEF ID LPAREN params RPAREN COLON declartions BEG body END
+    {
+
+        $$ = mknode("(FUNC\n\t ",
+                    mknode($2,
+                           mknode("\n",
+                                  mknode("\t\t(PARS\n\t ", $4, NULL),
+                                  mknode("\n\t\t(RET ",
+                                         mknode("\n\t\t(DECLS\n", $7, NULL),
+                                         NULL)
+                           ),
+                           NULL
+                    ),
+                    mknode(")\n", $9, NULL));
+    }
+
+  | DEF MAIN LPAREN params RPAREN COLON RETURNS functype BEG body_ret END
+    {
+
+        $$ = mknode("(FUNC\n\t ",
+                    mknode($2,
+                           mknode("\n",
+                                  mknode("\n\t\t(None\n ", NULL, NULL),
+                                  mknode("\n\t\t(RET ", $8, NULL)
+                           ),
+                           NULL
+                    ),
+                    mknode(")\n", $10, NULL));
+    }
+;
+
 
 
 functype:   BOOL {$$=mknode(" BOOL ",NULL,NULL);}
@@ -141,35 +154,47 @@ functype:   BOOL {$$=mknode(" BOOL ",NULL,NULL);}
 			| INTPTR {$$=mknode(" INT* ",NULL,NULL);}
 			;
 
-params:		parameters {$$= mknode("",$1,NULL);}
+params:		parameters {$$= mknode("PARAMLIST\n",$1,NULL);}
 			| {$$=mknode("NONE",NULL,NULL);}
 			;
 																						
-parameters: ARGS functype COLON par   SEMICOLON params {$$=mknode(" (",mknode($1,$2,$4), mknode(") ",mknode("\n",mknode("(",NULL,NULL),NULL),$6));}
-			|ARGS functype COLON par  {$$=mknode(" (",mknode($1,$2,$4),mknode(" )",NULL,NULL));}
-			;
+parameters:
+    parameters SEMICOLON ARGS functype COLON par {
+ 
+        $$ = mknode("",
+                    $1,
+                    mknode(" (", mknode($3, $4, $6), mknode(" )\n", NULL, NULL)));
+    }
+  | ARGS functype COLON par {
+        $$ = mknode(" (", mknode($1, $2, $4), mknode(" )\n", NULL, NULL));
+    }
+;
+
 
 par:		ID COMMA par {$$=mknode($1,mknode(" ",$3,NULL),NULL);}
 			| ID {$$=mknode($1, NULL, NULL);}
 			;
 
-body:		procedures declartions statements
+body:		procedures  statements
 {
-			$$=mknode("body ",mknode("",$1,NULL),mknode("",$2,mknode("",$3,mknode("}",NULL,NULL))));
+			$$=mknode("body ",mknode("",$1,NULL),mknode("",$2,mknode("}",NULL,NULL)));
 }
 
-body_ret:	procedures declartions statements ret
+body_ret:	procedures  statements ret
 {
-			$$=mknode("body ",mknode("",$1,NULL),mknode("",$2,mknode("",$3,mknode("",$4,NULL))));
+			$$=mknode("body ",mknode("",$1,NULL),mknode("",$2,mknode("}",NULL,NULL)));
 }
 
 ret: 		RETURN expr SEMICOLON {$$=mknode("return",$2,NULL);};
 
 
 
+declartions: varblock declartions {$$=mknode("",$1,$2);}
+			|{$$=NULL;}
 
 
-varblock: VAR typedecls BEG statements END{ $$ = mknode("DECLARE_BLOCK\n\t\t\t", $2, $4); }
+
+varblock: VAR typedecls{ $$ = mknode("DECLARE_BLOCK\n\t\t\t", $2, NULL); }
 
 typedecls:
     typedecls typedecl          { $$ = mknode("TYPELIST\n\t\t\t", $1, $2); }
@@ -178,6 +203,9 @@ typedecls:
 
 typedecl:
     TYPE functype COLON vardecls SEMICOLON  { $$ = mknode("TYPE", mknode($2->token, $4, NULL), NULL); }
+	| TYPE STRING COLON str_dec SEMICOLON {
+        $$ = mknode("TYPE", mknode("string", $4, NULL), NULL);
+      }
     ;
 
 vardecls:
@@ -185,15 +213,13 @@ vardecls:
   | vardecl                     { $$ = $1; }
     ;
 
-vardecl:
-    ID COLON value              { 
-		if (var_exists($1)){
-			yyerror("two variables have the same name in the scope! $17\n");
-			YYABORT;
-		}		
-		register_var($1);
+vardecl:	ID COLON value    { 
+
 		$$ = mknode("VAR_DEF", mknode($1, $3, NULL), NULL); 
 		}
+		| ID {
+        $$ = mknode("VAR_DEF", mknode($1, NULL, NULL), NULL);
+    }
 		
     ;
 
@@ -202,19 +228,34 @@ vardecl:
 
 
 
-declartions: varblock declartions {$$=mknode("",$1,$2);}
-            | {$$=NULL;}
-
 
 for_declars: VAR functype var_asis {$$=mknode("var",$2,$3);}
 			| lhs ASSIGNMENT expr {$$=mknode("=",$1,$3);}
 			| {$$=NULL;}
 
-str_dec:	ID LBRACKET DEC_VAL RBRACKET COMMA str_dec {$$=mknode($1,mknode("",mknode("[",mknode($3,NULL,NULL),mknode("]",NULL,NULL)),NULL),$6);}
-			| ID LBRACKET DEC_VAL RBRACKET {$$=mknode($1,mknode("",mknode("[",mknode($3,NULL,NULL),mknode("]",NULL,NULL)),NULL),NULL);}
-			| ID LBRACKET DEC_VAL RBRACKET ASSIGNMENT STR_VAL COMMA str_dec {$$=mknode($1,mknode("",mknode("[",mknode($3,NULL,NULL),mknode("]",NULL,NULL)),mknode($6,NULL,NULL)),$8);}
-			| ID LBRACKET DEC_VAL RBRACKET ASSIGNMENT STR_VAL {$$=mknode($1,mknode("",mknode("[",mknode($3,NULL,NULL),mknode("]",NULL,NULL)),mknode($6,NULL,NULL)),NULL);}
-			;
+str_dec:
+      str_item COMMA str_dec { $$ = mknode("VARLIST", $1, $3); }
+    | str_item    { $$ = $1; }
+    ;
+
+str_item:
+      ID LBRACKET DEC_VAL RBRACKET COLON STR_VAL {
+        $$ = mknode("VAR_DEF",
+                    mknode($1,
+                           mknode("size", mknode($3, NULL, NULL), NULL),
+                           mknode($6, NULL, NULL)),
+                    NULL);
+      }
+    | ID LBRACKET DEC_VAL RBRACKET {
+
+        $$ = mknode("VAR_DEF",
+                    mknode($1,
+                           mknode("size", mknode($3, NULL, NULL), NULL),
+                           NULL),
+                    NULL);
+      }
+    ;
+
 
 var_asis:	ID ASSIGNMENT value COMMA var_asis {$$=mknode($1,mknode("",$3,NULL),$5);}
 			| ID COMMA var_asis {$$=mknode($1,$3,NULL);}
@@ -253,6 +294,7 @@ stmnt_block: 	if_block {$$=$1;}
 				;
 
 statement:  expr SEMICOLON {$$=$1;}
+			| call_func {$$=$1;}
 			| assignment {$$=$1;}
 			| if {$$=$1;}
 			| if_else {$$=$1;}
@@ -262,15 +304,15 @@ statement:  expr SEMICOLON {$$=$1;}
 			| block {$$=$1;}
 			;
 
-if: 		IF  expr COLON stmnt_block 
-			{
-				$$=mknode("if",
-				mknode("", $2,
-				mknode("",NULL,NULL)),$4);
-			}%prec IF
+if: IF expr COLON stmnt_block  {
+
+    $$ = mknode("if", mknode("", $2, mknode("", NULL, NULL)), $4);
+}%prec IF
+
 
 if_else: 	IF  expr COLON stmnt_block  ELSE COLON stmnt_block
 			{
+
 				$$=mknode("if-else",
 				mknode("", $2,
 				mknode("",NULL,NULL)),
@@ -280,6 +322,7 @@ if_else: 	IF  expr COLON stmnt_block  ELSE COLON stmnt_block
 
 while:		WHILE  expr COLON stmnt_block
 			{
+
 				$$=mknode("while",
 				mknode(" ", $2,
 				mknode(" ",NULL,NULL)),$4);
@@ -295,6 +338,7 @@ do:			DO COLON stmnt_block WHILE  expr SEMICOLON
 
 for:		FOR LPAREN for_declars SEMICOLON expr SEMICOLON lhs ASSIGNMENT expr RPAREN COLON BEG stmnt_block END
 			{
+
 				$$=mknode("for",
 				mknode("(",$3,mknode("",$5,mknode("=",$7,mknode("",$9,mknode(")",NULL,NULL))))),
 				$13);
@@ -380,12 +424,8 @@ expr_list:	expr COMMA expr_list {$$=mknode("",$1,mknode("",$3,NULL));}
 
 paren_expr:	LPAREN expr_list RPAREN {$$=$2;};
 
-//call func rule
-call_func: ID paren_expr {
-	if (!func_exists($1)){
-		yyerror("function is not defined!");
-		YYABORT;
-	}
+call_func: ID paren_expr SEMICOLON {
+
 	$$=mknode("Call func",mknode($1,NULL,NULL),mknode("args ",$2,NULL));} ;
 
 %%
@@ -486,33 +526,6 @@ void printTree(node* tree) {
 	printtree(tree, 0, 0);
 }
 
-
-
-bool func_exists(char* name) {
-	for (int i = 0; i < func_count; ++i) {
-		if (strcmp(defined_funcs[i], name) == 0) return true;
-	}
-	return false;
-}
-
-void register_func(char* name) {
-	if (func_count < MAX_FUNCS) {
-		defined_funcs[func_count++] = strdup(name);
-	}
-}
-
-void register_var(char* name) {
-	if(var_count<MAX_Var){
-		defined_vars[var_count++] = strdup(name);
-	}
-}
-
-bool var_exists(char* name){
-	for(int i =0; i< var_count ; i++){
-		if (strcmp(defined_vars[i],name)==0) return true;
-	}
-	return false;
-}
 void printtree(node* tree, int level, int linebreak) {
 	char* t = tree->token;
 	struct node* left = tree->left;
