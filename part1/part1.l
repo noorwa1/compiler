@@ -70,14 +70,14 @@ returns {return RETURNS;}
  <comment>"<-#"  BEGIN 0;
  "<-#"
 
-true                                    {return BTRUE;}
+TRUE                                    {return BTRUE;}
 FALSE                                   {return BFALSE;}
 [a-zA-Z][a-zA-Z0-9_]*                   {yylval.string = strdup(yytext); return ID;}
 "\""[^"]*"\""                           {yylval.string = strdup(yytext); return STR_VAL;}
 \'.\'                                   {yylval.string = strdup(yytext); return CHAR_VAL;}
 [1-9][0-9]*|[0-9]                       {yylval.string = strdup(yytext); return DEC_VAL;}
 0(x|X)[0-9A-F]+                         {yylval.string = strdup(yytext); return HEX_VAL;}
-[0-9]\.?[0-9]([eE][-+]?[0-9]+)?       {yylval.string = strdup(yytext); return REAL_VAL;}
+[0-9]+\.[0-9]+([eE][-+]?[0-9]+)?       {yylval.string = strdup(yytext); return REAL_VAL;}
 
 [\n]                                    {yylineno++;} 
 [ \t]+                                  ;
