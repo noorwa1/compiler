@@ -46,8 +46,8 @@ returns {return RETURNS;}
 "<=" {return LTE;}
 "-" {return MINUS;}
 "!" {return NOT;}
-"!=" {return NOTEQ;}
-"||" {return OR;}
+"! =" {return NOTEQ;}
+"or" {return OR;}
 "+" {return PLUS;}
 "*" {return STAR;}
 "&" {return ADDRESS;}
@@ -77,7 +77,8 @@ FALSE                                   {return BFALSE;}
 \'.\'                                   {yylval.string = strdup(yytext); return CHAR_VAL;}
 [1-9][0-9]*|[0-9]                       {yylval.string = strdup(yytext); return DEC_VAL;}
 0(x|X)[0-9A-F]+                         {yylval.string = strdup(yytext); return HEX_VAL;}
-[0-9]+\.[0-9]+([eE][-+]?[0-9]+)?       {yylval.string = strdup(yytext); return REAL_VAL;}
+[0-9]+\.[0-9]*([eE][-+]?[0-9]+)?       {yylval.string = strdup(yytext); return REAL_VAL;}
+\.[0-9]+([eE][-+]?[0-9]+)?             {yylval.string = strdup(yytext); return REAL_VAL;}
 
 [\n]                                    {yylineno++;} 
 [ \t]+                                  ;

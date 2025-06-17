@@ -60,61 +60,60 @@ extern int yydebug;
     FOR = 261,                     /* FOR  */
     IF = 262,                      /* IF  */
     ELSE = 263,                    /* ELSE  */
-    VAR = 264,                     /* VAR  */
-    BOOL = 265,                    /* BOOL  */
-    STRING = 266,                  /* STRING  */
-    CHARPTR = 267,                 /* CHARPTR  */
-    CHAR = 268,                    /* CHAR  */
-    INT = 269,                     /* INT  */
-    INTPTR = 270,                  /* INTPTR  */
-    REAL = 271,                    /* REAL  */
-    REALPTR = 272,                 /* REALPTR  */
-    TYPE = 273,                    /* TYPE  */
-    ADDRESS = 274,                 /* ADDRESS  */
-    ASSIGNMENT = 275,              /* ASSIGNMENT  */
-    LENGTH = 276,                  /* LENGTH  */
-    NOT = 277,                     /* NOT  */
-    EQ = 278,                      /* EQ  */
-    NOTEQ = 279,                   /* NOTEQ  */
-    GTE = 280,                     /* GTE  */
-    GT = 281,                      /* GT  */
-    LTW = 282,                     /* LTW  */
-    LT = 283,                      /* LT  */
-    AND = 284,                     /* AND  */
-    OR = 285,                      /* OR  */
-    DIVISION = 286,                /* DIVISION  */
-    PLUS = 287,                    /* PLUS  */
-    MINUS = 288,                   /* MINUS  */
-    STAR = 289,                    /* STAR  */
-    DDASH = 290,                   /* DDASH  */
-    STR_VAL = 291,                 /* STR_VAL  */
-    REAL_VAL = 292,                /* REAL_VAL  */
-    CHAR_VAL = 293,                /* CHAR_VAL  */
-    DEC_VAL = 294,                 /* DEC_VAL  */
-    HEX_VAL = 295,                 /* HEX_VAL  */
-    NULLL = 296,                   /* NULLL  */
-    BTRUE = 297,                   /* BTRUE  */
-    BFALSE = 298,                  /* BFALSE  */
-    SEMICOLON = 299,               /* SEMICOLON  */
-    COMMA = 300,                   /* COMMA  */
-    LPAREN = 301,                  /* LPAREN  */
-    RPAREN = 302,                  /* RPAREN  */
-    LBRACKET = 303,                /* LBRACKET  */
-    RBRACKET = 304,                /* RBRACKET  */
-    LBRACE = 305,                  /* LBRACE  */
-    RBRACE = 306,                  /* RBRACE  */
-    BEG = 307,                     /* BEG  */
-    END = 308,                     /* END  */
-    COLON = 309,                   /* COLON  */
-    ARG_ARROW = 310,               /* ARG_ARROW  */
-    VOID = 311,                    /* VOID  */
-    FUNCTION = 312,                /* FUNCTION  */
-    MAIN = 313,                    /* MAIN  */
-    RETURN = 314,                  /* RETURN  */
-    ID = 315,                      /* ID  */
-    DEF = 316,                     /* DEF  */
-    RETURNS = 317,                 /* RETURNS  */
-    LTE = 318                      /* LTE  */
+    BOOL = 264,                    /* BOOL  */
+    STRING = 265,                  /* STRING  */
+    CHARPTR = 266,                 /* CHARPTR  */
+    CHAR = 267,                    /* CHAR  */
+    INT = 268,                     /* INT  */
+    INTPTR = 269,                  /* INTPTR  */
+    REAL = 270,                    /* REAL  */
+    REALPTR = 271,                 /* REALPTR  */
+    ADDRESS = 272,                 /* ADDRESS  */
+    ASSIGNMENT = 273,              /* ASSIGNMENT  */
+    LENGTH = 274,                  /* LENGTH  */
+    NOT = 275,                     /* NOT  */
+    EQ = 276,                      /* EQ  */
+    NOTEQ = 277,                   /* NOTEQ  */
+    GTE = 278,                     /* GTE  */
+    GT = 279,                      /* GT  */
+    LTW = 280,                     /* LTW  */
+    LT = 281,                      /* LT  */
+    AND = 282,                     /* AND  */
+    OR = 283,                      /* OR  */
+    DIVISION = 284,                /* DIVISION  */
+    PLUS = 285,                    /* PLUS  */
+    MINUS = 286,                   /* MINUS  */
+    STAR = 287,                    /* STAR  */
+    STR_VAL = 288,                 /* STR_VAL  */
+    REAL_VAL = 289,                /* REAL_VAL  */
+    CHAR_VAL = 290,                /* CHAR_VAL  */
+    DEC_VAL = 291,                 /* DEC_VAL  */
+    HEX_VAL = 292,                 /* HEX_VAL  */
+    NULLL = 293,                   /* NULLL  */
+    BTRUE = 294,                   /* BTRUE  */
+    BFALSE = 295,                  /* BFALSE  */
+    SEMICOLON = 296,               /* SEMICOLON  */
+    COMMA = 297,                   /* COMMA  */
+    LPAREN = 298,                  /* LPAREN  */
+    RPAREN = 299,                  /* RPAREN  */
+    LBRACKET = 300,                /* LBRACKET  */
+    RBRACKET = 301,                /* RBRACKET  */
+    LBRACE = 302,                  /* LBRACE  */
+    RBRACE = 303,                  /* RBRACE  */
+    BEG = 304,                     /* BEG  */
+    END = 305,                     /* END  */
+    COLON = 306,                   /* COLON  */
+    ARG_ARROW = 307,               /* ARG_ARROW  */
+    VOID = 308,                    /* VOID  */
+    FUNCTION = 309,                /* FUNCTION  */
+    MAIN = 310,                    /* MAIN  */
+    RETURN = 311,                  /* RETURN  */
+    ID = 312,                      /* ID  */
+    DEF = 313,                     /* DEF  */
+    RETURNS = 314,                 /* RETURNS  */
+    VAR = 315,                     /* VAR  */
+    TYPE = 316,                    /* TYPE  */
+    LTE = 317                      /* LTE  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -129,73 +128,77 @@ extern int yydebug;
 #define FOR 261
 #define IF 262
 #define ELSE 263
-#define VAR 264
-#define BOOL 265
-#define STRING 266
-#define CHARPTR 267
-#define CHAR 268
-#define INT 269
-#define INTPTR 270
-#define REAL 271
-#define REALPTR 272
-#define TYPE 273
-#define ADDRESS 274
-#define ASSIGNMENT 275
-#define LENGTH 276
-#define NOT 277
-#define EQ 278
-#define NOTEQ 279
-#define GTE 280
-#define GT 281
-#define LTW 282
-#define LT 283
-#define AND 284
-#define OR 285
-#define DIVISION 286
-#define PLUS 287
-#define MINUS 288
-#define STAR 289
-#define DDASH 290
-#define STR_VAL 291
-#define REAL_VAL 292
-#define CHAR_VAL 293
-#define DEC_VAL 294
-#define HEX_VAL 295
-#define NULLL 296
-#define BTRUE 297
-#define BFALSE 298
-#define SEMICOLON 299
-#define COMMA 300
-#define LPAREN 301
-#define RPAREN 302
-#define LBRACKET 303
-#define RBRACKET 304
-#define LBRACE 305
-#define RBRACE 306
-#define BEG 307
-#define END 308
-#define COLON 309
-#define ARG_ARROW 310
-#define VOID 311
-#define FUNCTION 312
-#define MAIN 313
-#define RETURN 314
-#define ID 315
-#define DEF 316
-#define RETURNS 317
-#define LTE 318
+#define BOOL 264
+#define STRING 265
+#define CHARPTR 266
+#define CHAR 267
+#define INT 268
+#define INTPTR 269
+#define REAL 270
+#define REALPTR 271
+#define ADDRESS 272
+#define ASSIGNMENT 273
+#define LENGTH 274
+#define NOT 275
+#define EQ 276
+#define NOTEQ 277
+#define GTE 278
+#define GT 279
+#define LTW 280
+#define LT 281
+#define AND 282
+#define OR 283
+#define DIVISION 284
+#define PLUS 285
+#define MINUS 286
+#define STAR 287
+#define STR_VAL 288
+#define REAL_VAL 289
+#define CHAR_VAL 290
+#define DEC_VAL 291
+#define HEX_VAL 292
+#define NULLL 293
+#define BTRUE 294
+#define BFALSE 295
+#define SEMICOLON 296
+#define COMMA 297
+#define LPAREN 298
+#define RPAREN 299
+#define LBRACKET 300
+#define RBRACKET 301
+#define LBRACE 302
+#define RBRACE 303
+#define BEG 304
+#define END 305
+#define COLON 306
+#define ARG_ARROW 307
+#define VOID 308
+#define FUNCTION 309
+#define MAIN 310
+#define RETURN 311
+#define ID 312
+#define DEF 313
+#define RETURNS 314
+#define VAR 315
+#define TYPE 316
+#define LTE 317
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 39 "part1.y"
+#line 35 "part1.y"
 
-    struct node *node;
-    char *string;
-	char* num;
+    char *temp;   // Temporary variable for expressions
+    char *string; // For identifiers and literals
+    char *num;    // For numbers
+    struct {
+        char *name;
+        int size;
+    } array;
+    int dummy;    // Dummy value for non-value rules
 
-#line 199 "y.tab.h"
+#line 202 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
